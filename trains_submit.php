@@ -1,0 +1,33 @@
+<?php
+require 'common.php';
+$train_no1=mysqli_real_escape_string($con,$_POST['trname']);
+$type=mysqli_real_escape_string($con,$_POST['type']);
+$pay=mysqli_real_escape_string($con,$_POST['pay']);
+$name2=$_SESSION['name'];
+$id=$_SESSION['id'];
+$name1 = implode(" ", $name2);
+$name = explode(" ",$name1)[0];
+$train_no = explode(" ",$train_no1)[0];
+$date = explode(" ",$train_no1)[1];
+$pass = explode(" ", $train_no1)[2];
+$query="INSERT INTO `reservation` (`Name`, `User_ID`, `Train_no`, `Date`, `passengers`, `Cab`) VALUES ('$name', '$id', '$train_no', '$date', $pass, '$type');";
+$check_submit= mysqli_query($con, $query) or die(mysqli_error($con));
+$query5 = "Update trains set `seats` = seats - '$pass' where `Train_no` = '$train_no'";
+$check_submit1=mysqli_query($con, $query5) or die(mysqli_error($con));
+$query1="select Destination from `trains` where `Train_no`='$train_no'";
+$check_submit1= mysqli_query($con, $query1);
+$city2 = mysqli_fetch_array($check_submit1);
+$city1 = implode(" ", $city2);
+$city = explode(" ",$city1)[0];
+$query2="select Arrival from `trains` where `Train_no`='$train_no'";
+$check_submit2= mysqli_query($con, $query2);
+$time2 = mysqli_fetch_array($check_submit2);
+$time1 = implode(" ", $time2);
+$time = explode(" ",$time1)[0];
+$query3 = "INSERT INTO `cab` (`User_ID`, `Train_no`, `city`, `type`, `Date`, `time`) VALUES ('$id', '$train_no', '$city', '$type', '$date', '$time');";
+$check_submit3= mysqli_query($con, $query3) or die(mysqli_error($con));
+$query4 = "INSERT INTO `transactions` (`User_ID`, `Payment_method`) VALUES ('$id', '$pay');";
+$check_submit4= mysqli_query($con, $query4) or die(mysqli_error($con));
+$message = "Ticket Booked Successfully.";
+echo "<script type='text/javascript'>alert('$message'); window.location='history.php';</script>";
+?>
